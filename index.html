@@ -2,13 +2,22 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>APIs</title>
+  <title>APIs estilo Netflix</title>
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       background: #141414;
       color: #fff;
+    }
+
+    header {
+      background: #000;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: #e50914;
     }
 
     section {
@@ -74,6 +83,8 @@
   </style>
 </head>
 <body>
+
+<header>APIFlix 🎬</header>
 
 <section>
   <h2>Pokémon</h2>
@@ -148,24 +159,26 @@ function buscarHP() {
     });
 }
 
-// Game of Thrones
+// Game of Thrones (corrigido com busca por nome na API)
 function buscarGOT() {
-  const nome = document.getElementById('gotInput').value.toLowerCase();
+  const nome = document.getElementById('gotInput').value;
   const container = document.getElementById('got');
   container.innerHTML = "";
 
-  fetch('https://anapioficeandfire.com/api/characters?page=1&pageSize=50')
+  fetch(`https://anapioficeandfire.com/api/characters?name=${nome}`)
     .then(res => res.json())
     .then(data => {
-      const resultados = data.filter(c => c.name.toLowerCase().includes(nome) && c.name !== "");
-
-      if (resultados.length > 0) {
-        resultados.slice(0,5).forEach(p => {
-          container.innerHTML += criarCard(p.name, 'https://via.placeholder.com/150');
+      if (data.length > 0) {
+        data.slice(0,5).forEach(p => {
+          const nomePersonagem = p.name || 'Sem nome';
+          container.innerHTML += criarCard(nomePersonagem, 'https://via.placeholder.com/150');
         });
       } else {
         container.innerHTML = "<p class='msg'>Não encontrado</p>";
       }
+    })
+    .catch(() => {
+      container.innerHTML = "<p class='msg'>Erro ao buscar</p>";
     });
 }
 
