@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>APIs</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #141414;
+      color: #fff;
+    }
+
+    section {
+      padding: 20px;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    input {
+      padding: 10px;
+      width: 200px;
+      border-radius: 5px;
+      border: none;
+      margin-right: 10px;
+    }
+
+    button {
+      padding: 10px;
+      background: #e50914;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .grid {
+      display: flex;
+      gap: 15px;
+      overflow-x: auto;
+      padding-top: 15px;
+    }
+
+    .card {
+      min-width: 150px;
+      background: #222;
+      border-radius: 10px;
+      overflow: hidden;
+      transition: transform 0.3s;
+    }
+
+    .card:hover {
+      transform: scale(1.1);
+    }
+
+    .card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .card p {
+      padding: 10px;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .msg {
+      padding-top: 10px;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+
+<section>
+  <h2>Pokémon</h2>
+  <input type="text" id="pokemonInput" placeholder="Digite o nome">
+  <button onclick="buscarPokemon()">Buscar</button>
+  <div id="pokemon" class="grid"></div>
+</section>
+
+<section>
+  <h2>Harry Potter</h2>
+  <input type="text" id="hpInput" placeholder="Digite o nome">
+  <button onclick="buscarHP()">Buscar</button>
+  <div id="hp" class="grid"></div>
+</section>
+
+<section>
+  <h2>Game of Thrones</h2>
+  <input type="text" id="gotInput" placeholder="Digite o nome">
+  <button onclick="buscarGOT()">Buscar</button>
+  <div id="got" class="grid"></div>
+</section>
+
+<script>
+
+function criarCard(nome, imagem) {
+  return `
+    <div class="card">
+      <img src="${imagem}" alt="${nome}">
+      <p>${nome}</p>
+    </div>
+  `;
+}
+
+// Pokémon
+function buscarPokemon() {
+  const nome = document.getElementById('pokemonInput').value.toLowerCase();
+  const container = document.getElementById('pokemon');
+  container.innerHTML = "";
+
+  fetch(`https://pokeapi.co/api/v2/pokemon/${nome}`)
+    .then(res => {
+      if (!res.ok) throw new Error();
+      return res.json();
+    })
+    .then(data => {
+      container.innerHTML = criarCard(data.name, data.sprites.front_default);
+    })
+    .catch(() => {
+      container.innerHTML = "<p class='msg'>Não encontrado</p>";
+    });
+}
+
+// Harry Potter
+function buscarHP() {
+  const nome = document.getElementById('hpInput').value.toLowerCase();
+  const container = document.getElementById('hp');
+  container.innerHTML = "";
+
+  fetch('https://hp-api.onrender.com/api/characters')
+    .then(res => res.json())
+    .then(data => {
+      const resultados = data.filter(c => c.name.toLowerCase().includes(nome));
+
+      if (resultados.length > 0) {
+        resultados.slice(0,5).forEach(p => {
+          const img = p.image || 'https://via.placeholder.com/150';
+          container.innerHTML += criarCard(p.name, img);
+        });
+      } else {
+        container.innerHTML = "<p class='msg'>Não encontrado</p>";
+      }
+    });
+}
+
+// Game of Thrones
+function buscarGOT() {
+  const nome = document.getElementById('gotInput').value.toLowerCase();
+  const container = document.getElementById('got');
+  container.innerHTML = "";
+
+  fetch('https://anapioficeandfire.com/api/characters?page=1&pageSize=50')
+    .then(res => res.json())
+    .then(data => {
+      const resultados = data.filter(c => c.name.toLowerCase().includes(nome) && c.name !== "");
+
+      if (resultados.length > 0) {
+        resultados.slice(0,5).forEach(p => {
+          container.innerHTML += criarCard(p.name, 'https://via.placeholder.com/150');
+        });
+      } else {
+        container.innerHTML = "<p class='msg'>Não encontrado</p>";
+      }
+    });
+}
+
+</script>
+
+</body>
+</html>
